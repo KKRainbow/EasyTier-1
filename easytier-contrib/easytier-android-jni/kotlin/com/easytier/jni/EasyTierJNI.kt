@@ -1,5 +1,9 @@
 package com.easytier.jni
 
+fun interface ConfigServerEventCallback {
+    fun onEvent(eventJson: String)
+}
+
 /** EasyTier JNI 接口类 提供 Android 应用调用 EasyTier 网络功能的接口 */
 object EasyTierJNI {
 
@@ -32,6 +36,35 @@ object EasyTierJNI {
      * @throws RuntimeException 当实例启动失败时抛出异常
      */
     @JvmStatic external fun runNetworkInstance(config: String): Int
+
+    /**
+     * 启动配置服务器客户端
+     * @param url 配置服务器 URL
+     * @param hostname 主机名，传入 null 使用系统主机名
+     * @param machineId 稳定机器 ID，由调用方负责持久化
+     * @param secureMode 是否启用 secure mode
+     * @param callback 远程配置应用/删除事件回调
+     * @return 0 表示成功，-1 表示失败
+     * @throws RuntimeException 当客户端启动失败时抛出异常
+     */
+    @JvmStatic
+    external fun startConfigServerClient(
+            url: String,
+            hostname: String?,
+            machineId: String,
+            secureMode: Boolean,
+            callback: ConfigServerEventCallback?
+    ): Int
+
+    /**
+     * 停止配置服务器客户端
+     * @return 0 表示成功，-1 表示失败
+     * @throws RuntimeException 当客户端停止失败时抛出异常
+     */
+    @JvmStatic external fun stopConfigServerClient(): Int
+
+    /** 查询配置服务器客户端是否已连接 */
+    @JvmStatic external fun isConfigServerClientConnected(): Boolean
 
     /**
      * 保留指定的网络实例，停止其他实例
