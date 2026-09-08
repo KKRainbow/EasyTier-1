@@ -7,14 +7,12 @@ use easytier_proto::{
             AclManageRpc, ConnectorManageRpc, CredentialInfo, CredentialManageRpc,
             GenerateCredentialRequest, GenerateCredentialResponse, GetAclStatsRequest,
             GetAclStatsResponse, GetPrometheusStatsRequest, GetPrometheusStatsResponse,
-            GetStatsRequest, GetStatsResponse, GetVpnPortalInfoRequest, GetVpnPortalInfoResponse,
-            GetWhitelistRequest, GetWhitelistResponse, ListCredentialsRequest,
-            ListCredentialsResponse, ListMappedListenerRequest, ListMappedListenerResponse,
-            ListPortForwardRequest, ListPortForwardResponse, MappedListener,
-            MappedListenerManageRpc, MetricSnapshot, PeerManageRpc, PortForwardManageRpc,
-            RevokeCredentialRequest, RevokeCredentialResponse, StatsRpc, UpsertCredentialRequest,
-            UpsertCredentialResponse, VpnPortalClientInfo, VpnPortalClientState, VpnPortalInfo,
-            VpnPortalRpc,
+            GetStatsRequest, GetStatsResponse, GetWhitelistRequest, GetWhitelistResponse,
+            ListCredentialsRequest, ListCredentialsResponse, ListMappedListenerRequest,
+            ListMappedListenerResponse, ListPortForwardRequest, ListPortForwardResponse,
+            MappedListener, MappedListenerManageRpc, MetricSnapshot, PeerManageRpc,
+            PortForwardManageRpc, RevokeCredentialRequest, RevokeCredentialResponse, StatsRpc,
+            UpsertCredentialRequest, UpsertCredentialResponse,
         },
     },
     common::PortForwardConfigPb,
@@ -25,9 +23,14 @@ use easytier_proto::{
     rpc_types::{self, controller::BaseController},
 };
 
+#[cfg(feature = "vpn-portal")]
+use easytier_proto::api::instance::{
+    GetVpnPortalInfoRequest, GetVpnPortalInfoResponse, VpnPortalClientInfo, VpnPortalClientState,
+    VpnPortalInfo, VpnPortalRpc,
+};
+
 use crate::{
     config::toml::ConfigLoader as _,
-    gateway::vpn_portal::{PortalClientState, PortalInfoSnapshot},
     instance::{
         CoreInstance, CoreInstanceHost,
         manager::{InstanceFactory, InstanceManager},
@@ -36,6 +39,9 @@ use crate::{
         CredentialCreateOptions, CredentialInfo as CoreCredentialInfo, CredentialUpsertOptions,
     },
 };
+
+#[cfg(feature = "vpn-portal")]
+use crate::gateway::vpn_portal::{PortalClientState, PortalInfoSnapshot};
 
 use super::InstanceManagementRpc;
 use crate::management::{full::packet_proxy, resolve_instance};
@@ -76,6 +82,7 @@ where
         "api.instance.MappedListenerManageRpcService" => {
             MappedListenerManageRpc::json_call_method(&rpc, ctrl, method_name, payload).await
         }
+        #[cfg(feature = "vpn-portal")]
         "api.instance.VpnPortalRpcService" => {
             VpnPortalRpc::json_call_method(&rpc, ctrl, method_name, payload).await
         }
@@ -142,6 +149,7 @@ where
     }
 }
 
+#[cfg(feature = "vpn-portal")]
 fn vpn_portal_info_to_proto(info: PortalInfoSnapshot) -> VpnPortalInfo {
     let client_config = info
         .clients
@@ -183,6 +191,7 @@ fn vpn_portal_info_to_proto(info: PortalInfoSnapshot) -> VpnPortalInfo {
     }
 }
 
+#[cfg(feature = "vpn-portal")]
 #[async_trait::async_trait]
 impl<F, H> VpnPortalRpc for InstanceManagementRpc<F>
 where
@@ -427,7 +436,7 @@ where
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "vpn-portal"))]
 mod tests {
     use std::net::Ipv4Addr;
 

@@ -122,7 +122,7 @@ extended-services = [
     "proxy-cidr-monitor",
 ]
 web-client = ["management-rpc", "config-write"]
-management = ["web-client", "extended-services", "rich-config-errors", "easytier-proto/json-rpc"]
+management = ["web-client", "rich-config-errors", "easytier-proto/json-rpc"]
 management-rpc = ["easytier-proto/api"]
 proxy-cidr-monitor = []
 rich-config-errors = ["dep:ariadne"]

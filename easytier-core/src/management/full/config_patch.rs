@@ -119,6 +119,7 @@ where
         // Runs last so client validation sees the fully patched candidate,
         // including routes and the node IPv4 set earlier in this request.
         if !patch.vpn_portal_clients.is_empty() {
+            #[cfg(feature = "vpn-portal")]
             let previous = config.detached_snapshot();
             apply_vpn_portal_client_patches(&candidate, patch.vpn_portal_clients)?;
             // Deep-validate and durably persist before hot-applying. A failed

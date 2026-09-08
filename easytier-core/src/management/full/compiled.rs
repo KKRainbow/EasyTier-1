@@ -6,11 +6,14 @@ use easytier_proto::{
         instance::{
             AclManageRpcServer, ConnectorManageRpcServer, CredentialManageRpcServer,
             MappedListenerManageRpcServer, PeerManageRpcServer, PortForwardManageRpcServer,
-            StatsRpcServer, VpnPortalRpcServer,
+            StatsRpcServer,
         },
     },
     peer_rpc::PeerCenterRpcServer,
 };
+
+#[cfg(feature = "vpn-portal")]
+use easytier_proto::api::instance::VpnPortalRpcServer;
 
 use super::super::instance_rpc::InstanceManagementRpc;
 use super::ConfigFileStorage;
@@ -36,6 +39,7 @@ pub fn register_instance_management_rpc<F, H>(
     registry.register(PeerManageRpcServer::new(rpc.clone()), "");
     registry.register(ConnectorManageRpcServer::new(rpc.clone()), "");
     registry.register(MappedListenerManageRpcServer::new(rpc.clone()), "");
+    #[cfg(feature = "vpn-portal")]
     registry.register(VpnPortalRpcServer::new(rpc.clone()), "");
     super::packet_proxy::register(manager.clone(), registry);
     registry.register(AclManageRpcServer::new(rpc.clone()), "");

@@ -7,16 +7,25 @@ edition.workspace = true
 crate-type = ["cdylib", "rlib"]
 
 [features]
-default = ["c-abi", "ffi-dataplane"]
+default = ["c-abi", "ffi-dataplane", "full-engine"]
 c-abi = []
+full-engine = ["easytier/default", "easytier-core/default"]
 ffi-dataplane = [
     "easytier/ffi-dataplane",
     "easytier-core/proxy-smoltcp-stack",
 ]
+ios-app = [
+    "c-abi",
+    "ffi-dataplane",
+    "easytier/aes-gcm",
+    "easytier/endpoint-discovery",
+    "easytier/management",
+    "easytier/tcp-hole-punch",
+]
 
 [dependencies]
-easytier = { path = "../../easytier", features = ["tracing-log"] }
-easytier-core = { path = "../../easytier-core" }
+easytier = { path = "../../easytier", default-features = false, features = ["tracing-log"] }
+easytier-core = { path = "../../easytier-core", default-features = false }
 
 once_cell = "1.18.0"
 tokio = { version = "1", features = ["rt-multi-thread", "io-util", "time", "sync", "macros"] }
